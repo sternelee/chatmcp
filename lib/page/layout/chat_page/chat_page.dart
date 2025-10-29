@@ -421,6 +421,32 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  void _handleKbDocumentSelected(String document) {
+    // Add knowledge base document to the current input text with enhanced formatting
+    final currentText = _inputAreaKey.currentState?.textEditingController.text ?? '';
+    final separator = currentText.trim().isEmpty ? '' : '\n\n';
+
+    // Enhanced formatting with shadcn/ui inspired design
+    final formattedContext = '''
+📚 **Knowledge Base Context**
+
+> $document
+
+---
+
+*This context was added from your knowledge base to provide relevant information for your query.*''';
+
+    final newText = '$currentText${separator}$formattedContext';
+
+    _inputAreaKey.currentState?.textEditingController.text = newText;
+    _handleTextChanged(newText);
+
+    // Focus back to input after adding document
+    if (_inputAreaKey.currentState != null) {
+      _inputAreaKey.currentState!.requestFocus();
+    }
+  }
+
   String? _findClientName(Map<String, List<Map<String, dynamic>>> tools, String toolName) {
     for (var entry in tools.entries) {
       final clientTools = entry.value;
@@ -1179,6 +1205,7 @@ class _ChatPageState extends State<ChatPage> {
             onTextChanged: _handleTextChanged,
             onSubmitted: _handleSubmitted,
             onCancel: _handleCancel,
+            onKbDocumentSelected: _handleKbDocumentSelected,
           ),
         ],
       );
@@ -1199,6 +1226,7 @@ class _ChatPageState extends State<ChatPage> {
                 onTextChanged: _handleTextChanged,
                 onSubmitted: _handleSubmitted,
                 onCancel: _handleCancel,
+                onKbDocumentSelected: _handleKbDocumentSelected,
               ),
             ],
           ),

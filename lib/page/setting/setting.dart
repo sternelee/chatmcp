@@ -1,11 +1,12 @@
 import 'package:chatmcp/utils/platform.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:chatmcp/generated/app_localizations.dart';
 import 'llm_setting.dart';
 import 'mcp_server.dart';
 import 'general_setting.dart';
-import 'package:chatmcp/generated/app_localizations.dart';
-import 'package:flutter/cupertino.dart';
 import 'network_sync_setting.dart';
+import 'knowledge_base_page.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -22,6 +23,7 @@ class _SettingPageState extends State<SettingPage> {
       SettingTab(title: l10n.providers, icon: CupertinoIcons.cube, content: KeysSettings()),
       SettingTab(title: l10n.mcpServer, icon: CupertinoIcons.hammer, content: McpServer()),
       if (!kIsBrowser) SettingTab(title: l10n.dataSync, icon: CupertinoIcons.cloud_download, content: NetworkSyncSetting()),
+      SettingTab(title: 'Knowledge Base', icon: Icons.psychology, content: KnowledgeBasePage()),
     ];
   }
 

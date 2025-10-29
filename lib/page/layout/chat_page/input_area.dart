@@ -1,4 +1,5 @@
 import 'package:chatmcp/page/layout/widgets/mcp_tools.dart';
+import 'package:chatmcp/page/layout/widgets/kb_document_selector_shadcn.dart';
 import 'package:chatmcp/provider/provider_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +31,7 @@ class InputArea extends StatefulWidget {
   final ValueChanged<SubmitData> onSubmitted;
   final VoidCallback? onCancel;
   final ValueChanged<List<PlatformFile>>? onFilesSelected;
+  final ValueChanged<String>? onKbDocumentSelected;
   final bool autoFocus;
 
   const InputArea({
@@ -39,6 +41,7 @@ class InputArea extends StatefulWidget {
     required this.onTextChanged,
     required this.onSubmitted,
     this.onFilesSelected,
+    this.onKbDocumentSelected,
     this.onCancel,
     this.autoFocus = false,
   });
@@ -52,6 +55,9 @@ class InputAreaState extends State<InputArea> {
   final TextEditingController textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _isImeComposing = false;
+
+  // Expose text controller for external access
+  TextEditingController get textEditingController => textController;
 
   @override
   void initState() {
@@ -324,6 +330,13 @@ class InputAreaState extends State<InputArea> {
                           tooltip: AppLocalizations.of(context)!.uploadFile,
                         ),
                       ],
+                      const SizedBox(width: 10),
+                      KbDocumentSelector(
+                        disabled: widget.disabled,
+                        onDocumentSelected: (document) {
+                          widget.onKbDocumentSelected?.call(document);
+                        },
+                      ),
                       const SizedBox(width: 10),
                       const ConvSetting(),
                     ],

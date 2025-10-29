@@ -5,6 +5,9 @@ import 'mcp_server_provider.dart';
 import 'chat_provider.dart';
 import 'chat_model_provider.dart';
 import 'serve_state_provider.dart';
+import 'llm_functionality_provider.dart';
+import 'vector_database_provider.dart';
+import 'knowledge_base_provider.dart';
 import 'package:chatmcp/repository/chat_repository_provider.dart';
 import 'package:logging/logging.dart';
 
@@ -15,6 +18,9 @@ class ProviderManager {
     ChangeNotifierProvider<ChatProvider>(create: (_) => ChatProvider()),
     ChangeNotifierProvider<ChatModelProvider>(create: (_) => ChatModelProvider()),
     ChangeNotifierProvider<ServerStateProvider>(create: (_) => ServerStateProvider()),
+    ChangeNotifierProvider<LLMFunctionalityProvider>(create: (_) => LLMFunctionalityProvider()),
+    ChangeNotifierProvider<VectorDatabaseProvider>(create: (_) => VectorDatabaseProvider()),
+    ChangeNotifierProvider<KnowledgeBaseProvider>(create: (_) => KnowledgeBaseProvider()),
     // Add other Providers here
   ];
 
@@ -53,10 +59,37 @@ class ProviderManager {
     return _serverStateProvider!;
   }
 
+  static LLMFunctionalityProvider? _llmFunctionalityProvider;
+
+  static LLMFunctionalityProvider get llmFunctionalityProvider {
+    _llmFunctionalityProvider ??= LLMFunctionalityProvider();
+    return _llmFunctionalityProvider!;
+  }
+
+  static VectorDatabaseProvider? _vectorDatabaseProvider;
+
+  static VectorDatabaseProvider get vectorDatabaseProvider {
+    _vectorDatabaseProvider ??= VectorDatabaseProvider();
+    return _vectorDatabaseProvider!;
+  }
+
+  static KnowledgeBaseProvider? _knowledgeBaseProvider;
+
+  static KnowledgeBaseProvider get knowledgeBaseProvider {
+    _knowledgeBaseProvider ??= KnowledgeBaseProvider();
+    return _knowledgeBaseProvider!;
+  }
+
   static Future<void> init() async {
     // Initialize libsql_dart repository by default
     ChatRepositoryProvider.enableLibSqlMode();
     Logger.root.info('Initialized libsql_dart repository');
+
+    // Initialize vector database
+    await VectorDatabaseProvider().initialize();
+
+    // Initialize knowledge base
+    await KnowledgeBaseProvider().initialize();
 
     await SettingsProvider().loadSettings();
     await ChatProvider().loadChats();
