@@ -132,13 +132,26 @@ class _ChatPageState extends State<ChatPage> {
           barrierDismissible: false,
           builder: (BuildContext context) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outline.withAlpha(77),
+                  width: 1,
+                ),
+              ),
+              elevation: 8,
               title: Text(t.functionCallAuth),
               content: SingleChildScrollView(
                 child: ListBody(children: <Widget>[Text(t.allowFunctionExecution), SizedBox(height: 8), Text(event.name), SizedBox(height: 8)]),
               ),
               actions: <Widget>[
                 TextButton(
+                  style: TextButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   child: Text(t.cancel),
                   onPressed: () {
                     setState(() {
@@ -148,6 +161,13 @@ class _ChatPageState extends State<ChatPage> {
                   },
                 ),
                 TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   child: Text(t.allow),
                   onPressed: () {
                     Navigator.of(context).pop(true);
@@ -950,14 +970,22 @@ class _ChatPageState extends State<ChatPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: Row(
               children: [
-                Icon(Icons.error_outline, color: AppColors.getErrorIconColor()),
+                Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
                 const SizedBox(width: 8),
                 Text(AppLocalizations.of(context)!.error),
               ],
             ),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.outline.withAlpha(77),
+                width: 1,
+              ),
+            ),
+            elevation: 8,
             content: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -965,16 +993,26 @@ class _ChatPageState extends State<ChatPage> {
                 children: [
                   Text(
                     _getUserFriendlyErrorMessage(error),
-                    style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.getErrorTextColor()),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.error),
                   ),
                   const SizedBox(height: 8),
-                  Text('error type: ${error.runtimeType}', style: TextStyle(fontSize: 12, color: AppColors.getErrorTextColor().withAlpha(128))),
+                  Text('error type: ${error.runtimeType}', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
                   if (error is LLMException)
-                    Text(error.toString(), style: TextStyle(fontSize: 12, color: AppColors.getErrorTextColor().withAlpha(128))),
+                    Text(error.toString(), style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 ],
               ),
             ),
-            actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(AppLocalizations.of(context)!.close))],
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(AppLocalizations.of(context)!.close)
+              )
+            ],
           );
         },
       );

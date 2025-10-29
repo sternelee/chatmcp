@@ -36,7 +36,7 @@ class _SettingPageState extends State<SettingPage> {
           toolbarHeight: 0,
           bottom: TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
-            indicatorWeight: 5,
+            indicatorWeight: 3,
             labelStyle: TextStyle(fontSize: kIsMobile ? 10 : 14),
             tabs: tabs.map((tab) => Tab(icon: Icon(tab.icon), text: tab.title)).toList(),
             onTap: (index) {

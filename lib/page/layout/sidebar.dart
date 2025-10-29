@@ -89,16 +89,18 @@ class _SidebarPanelState extends State<SidebarPanel> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
                 child: Container(
-                  height: 32,
+                  height: 36,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    color: AppColors.getThemeColor(context, lightColor: Colors.grey[300], darkColor: Colors.grey[600]),
+                    color: Theme.of(context).colorScheme.surface,
+                    border: Border.all(color: Theme.of(context).colorScheme.outline.withAlpha(77)),
                   ),
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: AppLocalizations.of(context)!.search,
-                      hintStyle: const TextStyle(fontSize: 12),
+                      hintStyle: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      prefixIcon: const Icon(CupertinoIcons.search, size: 16),
                       suffixIcon: IconButton(
                         icon: const Icon(CupertinoIcons.clear, size: 14),
                         onPressed: () {
@@ -587,9 +589,17 @@ class SidebarToolbar extends StatelessWidget {
       showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outline.withAlpha(77),
+              width: 1,
+            ),
+          ),
+          elevation: 8,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(16),
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.8,
               height: MediaQuery.of(context).size.height * 0.8,
@@ -606,16 +616,39 @@ class SidebarToolbar extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(l10n.confirmDelete),
         content: Text(l10n.confirmDeleteSelected),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: Theme.of(context).colorScheme.outline.withAlpha(77),
+            width: 1,
+          ),
+        ),
+        elevation: 8,
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(l10n.cancel),
+          ),
           TextButton(
             onPressed: () {
               chatProvider.deleteSelectedChats();
               Navigator.pop(context);
             },
+            style: TextButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
             child: Text(l10n.ok),
           ),
         ],

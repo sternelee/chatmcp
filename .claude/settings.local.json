@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__mcphub__context7-resolve-library-id",
+      "WebFetch(domain:pub.dev)",
+      "Bash(flutter pub add:*)",
+      "Bash(flutter analyze:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "mcp_box"
+  ]
+}

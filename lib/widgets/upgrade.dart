@@ -304,14 +304,22 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
           title: Row(
             children: [
-              const Icon(Icons.new_releases, color: Colors.red),
+              Icon(Icons.new_releases, color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: 8),
               Text(l10n.newVersionFound(_newVersion)),
             ],
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outline.withAlpha(77),
+              width: 1,
+            ),
+          ),
+          elevation: 8,
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -325,8 +333,9 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Theme.of(context).dividerColor),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline.withAlpha(77)),
+                      color: Theme.of(context).colorScheme.surfaceVariant.withAlpha(51),
                     ),
                     child: Markit(data: _releaseNotes, textStyle: const TextStyle(fontSize: 12)),
                   ),
@@ -336,6 +345,11 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
           ),
           actions: <Widget>[
             TextButton(
+              style: TextButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               onPressed: () {
                 _dismissUpdate();
                 Navigator.of(context).pop();
@@ -343,12 +357,22 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
               child: Text(l10n.ignoreThisVersion),
             ),
             TextButton(
+              style: TextButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
               child: Text(l10n.updateLater),
             ),
             FilledButton(
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               onPressed: () {
                 _openReleaseUrl();
                 Navigator.of(context).pop();

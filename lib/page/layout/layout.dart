@@ -56,11 +56,24 @@ class _LayoutPageState extends State<LayoutPage> {
       showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8,
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: const SettingPage(),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outline.withAlpha(77),
+              width: 1,
+            ),
+          ),
+          elevation: 8,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.8,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: const SettingPage(),
+            ),
           ),
         ),
       );

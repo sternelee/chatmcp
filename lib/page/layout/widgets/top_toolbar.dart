@@ -37,11 +37,24 @@ class TopToolbar extends StatelessWidget {
       showDialog(
         context: context,
         builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8,
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: Padding(padding: const EdgeInsets.all(16), child: const ChatSetting()),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outline.withAlpha(77),
+              width: 1,
+            ),
+          ),
+          elevation: 8,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.8,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: const Padding(padding: EdgeInsets.all(16), child: ChatSetting()),
+            ),
           ),
         ),
       );
@@ -76,6 +89,7 @@ class TopToolbar extends StatelessWidget {
           InkWell(
             onTap: () {
               _onShowChatSetting(context);
+              Navigator.of(context).pop();
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -116,14 +130,42 @@ class TopToolbar extends StatelessWidget {
           if (ProviderManager.chatProvider.activeChat != null)
             InkWell(
               onTap: () async {
+                Navigator.of(context).pop();
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (context) => AlertDialog(
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     title: Text(l10n.confirmDelete),
                     content: Text('${l10n.confirmThisChat}?'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.outline.withAlpha(77),
+                        width: 1,
+                      ),
+                    ),
+                    elevation: 8,
                     actions: [
-                      TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(MaterialLocalizations.of(context).cancelButtonLabel)),
-                      TextButton(onPressed: () => Navigator.of(context).pop(true), child: Text(MaterialLocalizations.of(context).okButtonLabel)),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+                      ),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.error,
+                          foregroundColor: Theme.of(context).colorScheme.onError,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: Text(MaterialLocalizations.of(context).okButtonLabel),
+                      ),
                     ],
                   ),
                 );
@@ -132,16 +174,15 @@ class TopToolbar extends StatelessWidget {
                   if (chat != null) {
                     ProviderManager.chatProvider.deleteChat(chat.id!);
                   }
-                  Navigator.of(context).pop(); // Close the popup after deleting
                 }
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
-                    const Icon(CupertinoIcons.delete, size: 18),
+                    const Icon(CupertinoIcons.delete, size: 18, color: Colors.red),
                     const SizedBox(width: 12),
-                    Text(l10n.delete, style: TextStyle(color: AppColors.getThemeTextColor(context))),
+                    Text(l10n.delete, style: const TextStyle(color: Colors.red)),
                   ],
                 ),
               ),
