@@ -5,6 +5,8 @@ import 'mcp_server_provider.dart';
 import 'chat_provider.dart';
 import 'chat_model_provider.dart';
 import 'serve_state_provider.dart';
+import 'package:chatmcp/repository/chat_repository_provider.dart';
+import 'package:logging/logging.dart';
 
 class ProviderManager {
   static List<ChangeNotifierProvider> providers = [
@@ -52,6 +54,10 @@ class ProviderManager {
   }
 
   static Future<void> init() async {
+    // Initialize libsql_dart repository by default
+    ChatRepositoryProvider.enableLibSqlMode();
+    Logger.root.info('Initialized libsql_dart repository');
+
     await SettingsProvider().loadSettings();
     await ChatProvider().loadChats();
     await McpServerProvider().init();

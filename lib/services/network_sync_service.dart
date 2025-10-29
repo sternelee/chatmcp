@@ -9,10 +9,12 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:logging/logging.dart';
 import 'package:chatmcp/dao/init_db.dart';
+import 'package:chatmcp/dao/libsql_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:chatmcp/provider/provider_manager.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:chatmcp/utils/platform.dart';
+import 'package:chatmcp/repository/libsql_chat_repository.dart';
 
 class NetworkSyncService {
   static final NetworkSyncService _instance = NetworkSyncService._internal();
@@ -293,8 +295,49 @@ class NetworkSyncService {
 
   /// Export all data
   Future<Map<String, dynamic>> _exportAllData() async {
-    final db = await DatabaseHelper.instance.database;
     final prefs = await SharedPreferences.getInstance();
+
+    try {
+      // Use the new libsql_dart repository for data export
+      final repository = LibSqlChatRepository();
+      final data = await repository.exportChatData();
+
+      // Export settings
+      final settings = <String, dynamic>{};
+      for (String key in prefs.getKeys()) {
+        final value = prefs.get(key);
+        settings[key] = value;
+      }
+
+      // Export MCP server config
+      Map<String, dynamic>? mcpConfig;
+      try {
+        final provider = ProviderManager.mcpServerProvider;
+        mcpConfig = await provider.loadServersAll();
+      } catch (e) {
+        Logger.root.warning('Failed to export MCP config: $e');
+      }
+
+      return {
+        'version': '1.0',
+        'timestamp': DateTime.now().toIso8601String(),
+        'device': {'name': Platform.localHostname, 'platform': Platform.operatingSystem},
+        'chat': data['chats'],
+        'chat_message': data['messages'],
+        'settings': settings,
+        'mcp_config': mcpConfig,
+        'repository': 'libsql_dart',
+      };
+    } catch (e) {
+      // Fallback to old sqflite method if libsql_dart fails
+      Logger.root.warning('libsql_dart export failed, falling back to sqflite: $e');
+      return await _exportSqfliteData(prefs);
+    }
+  }
+
+  /// Fallback export using old sqflite method
+  Future<Map<String, dynamic>> _exportSqfliteData(SharedPreferences prefs) async {
+    final db = await DatabaseHelper.instance.database;
 
     // Export database data
     final chatData = await db.query('chat');
@@ -324,48 +367,30 @@ class NetworkSyncService {
       'chat_message': messageData,
       'settings': settings,
       'mcp_config': mcpConfig,
+      'repository': 'sqflite',
     };
   }
 
   /// Import all data
   Future<void> _importAllData(Map<String, dynamic> data) async {
-    final db = await DatabaseHelper.instance.database;
     final prefs = await SharedPreferences.getInstance();
 
     try {
-      await db.transaction((txn) async {
-        // Import chat data
-        if (data['chat'] != null) {
-          for (var chat in data['chat']) {
-            try {
-              await txn.insert('chat', chat, conflictAlgorithm: ConflictAlgorithm.replace);
-            } catch (e) {
-              // If fields don't match, try to insert only compatible fields
-              Logger.root.warning('Failed to insert chat with full schema, trying compatible fields: $e');
-              final compatibleChat = <String, dynamic>{
-                'id': chat['id'],
-                'title': chat['title'],
-                'createdAt': chat['createdAt'],
-                'updatedAt': chat['updatedAt'],
-              };
-              // Only add model field if it exists
-              if (chat.containsKey('model')) {
-                compatibleChat['model'] = chat['model'];
-              }
-              await txn.insert('chat', compatibleChat, conflictAlgorithm: ConflictAlgorithm.replace);
-            }
-          }
-        }
+      // Check which repository was used for export
+      final repository = data['repository'] as String? ?? 'sqflite';
 
-        // Import message data
-        if (data['chat_message'] != null) {
-          for (var message in data['chat_message']) {
-            await txn.insert('chat_message', message, conflictAlgorithm: ConflictAlgorithm.replace);
-          }
-        }
-      });
+      if (repository == 'libsql_dart') {
+        // Use new libsql_dart repository for import
+        final libsqlRepo = LibSqlChatRepository();
+        await libsqlRepo.importChatData(data);
+        Logger.root.info('Successfully imported data using libsql_dart repository');
+      } else {
+        // Use old sqflite method for backward compatibility
+        await _importSqfliteData(data, prefs);
+        Logger.root.info('Successfully imported data using sqflite repository');
+      }
 
-      // Import settings
+      // Import settings (common for both repositories)
       if (data['settings'] != null) {
         final settings = data['settings'] as Map<String, dynamic>;
         for (var entry in settings.entries) {
@@ -414,6 +439,43 @@ class NetworkSyncService {
       Logger.root.severe('Failed to import data: $e');
       rethrow;
     }
+  }
+
+  /// Import data using old sqflite method
+  Future<void> _importSqfliteData(Map<String, dynamic> data, SharedPreferences prefs) async {
+    final db = await DatabaseHelper.instance.database;
+
+    await db.transaction((txn) async {
+      // Import chat data
+      if (data['chat'] != null) {
+        for (var chat in data['chat']) {
+          try {
+            await txn.insert('chat', chat, conflictAlgorithm: ConflictAlgorithm.replace);
+          } catch (e) {
+            // If fields don't match, try to insert only compatible fields
+            Logger.root.warning('Failed to insert chat with full schema, trying compatible fields: $e');
+            final compatibleChat = <String, dynamic>{
+              'id': chat['id'],
+              'title': chat['title'],
+              'createdAt': chat['createdAt'],
+              'updatedAt': chat['updatedAt'],
+            };
+            // Only add model field if it exists
+            if (chat.containsKey('model')) {
+              compatibleChat['model'] = chat['model'];
+            }
+            await txn.insert('chat', compatibleChat, conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+        }
+      }
+
+      // Import message data
+      if (data['chat_message'] != null) {
+        for (var message in data['chat_message']) {
+          await txn.insert('chat_message', message, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+      }
+    });
   }
 }
 

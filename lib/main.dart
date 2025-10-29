@@ -1,4 +1,5 @@
 import 'package:chatmcp/dao/init_db.dart';
+import 'package:chatmcp/dao/libsql_init_db.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart' as wm;
@@ -53,7 +54,10 @@ void main() async {
   }
 
   try {
-    await Future.wait([ProviderManager.init(), initDb()]);
+    // Initialize database (libsql_dart with migration support)
+    await initLibSqlDatabase(enableRemoteSync: false);
+
+    await Future.wait([ProviderManager.init()]);
 
     var app = MyApp();
 
