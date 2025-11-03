@@ -9,7 +9,6 @@ import 'package:chatmcp/utils/platform.dart';
 import 'package:chatmcp/utils/storage_manager.dart';
 import '../mcp/client/mcp_client_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../mcp/models/server.dart';
 import '../utils/oauth_web.dart' if (dart.library.io) '../utils/oauth_stub.dart';
 import '../utils/oauth_discovery.dart';
 

@@ -1,6 +1,5 @@
 import 'package:logging/logging.dart';
 import 'package:chatmcp/dao/libsql_init_db.dart';
-import 'package:chatmcp/dao/database_migration_helper.dart';
 import 'package:chatmcp/repository/chat_repository_provider.dart';
 import 'package:chatmcp/dao/libsql_database.dart';
 
@@ -40,7 +39,11 @@ class DatabaseMigrationService {
       return DatabaseStatus(
         isUsingLibSql: false,
         isInitialized: false,
+        databaseVersion: 0,
+        remoteSyncEnabled: false,
         isHealthy: false,
+        chatCount: 0,
+        messageCount: 0,
         lastError: e.toString(),
       );
     }
@@ -244,6 +247,100 @@ enum MigrationType {
   statusCheck,
   error,
   configuration,
+}
+
+/// Get libsql database information
+Future<Map<String, dynamic>> getLibSqlDatabaseInfo() async {
+  try {
+    final db = LibSqlDatabase.instance;
+    final client = db.client;
+
+    // Check database connection
+    await client.execute('SELECT 1');
+
+    // Get database version
+    final versionResultSet = await client.query('PRAGMA user_version');
+    final version = versionResultSet.isNotEmpty ? versionResultSet.first['user_version'] ?? 0 : 0;
+
+    // Get table info
+    final tablesResultSet = await client.query(
+      "SELECT name FROM sqlite_master WHERE type='table'"
+    );
+    final tables = tablesResultSet.isNotEmpty
+        ? tablesResultSet.map((row) => row['name'] as String).toList()
+        : <String>[];
+
+    return {
+      'initialized': true,
+      'version': version,
+      'migrationStatus': version > 0 ? 'migrated' : 'not_started',
+      'remoteSync': db.client.url != null,
+      'remoteUrl': db.client.url,
+      'databasePath': db.client.url,
+      'tables': tables,
+      'connectionType': db.client.url != null ? 'remote' : 'local',
+    };
+  } catch (e) {
+    Logger.root.warning('Failed to get libsql database info: $e');
+    return {
+      'initialized': false,
+      'version': 0,
+      'migrationStatus': 'error',
+      'remoteSync': false,
+      'error': e.toString(),
+    };
+  }
+}
+
+/// Perform libsql database health check
+Future<Map<String, dynamic>> performLibSqlHealthCheck() async {
+  try {
+    final db = LibSqlDatabase.instance;
+    final client = db.client;
+
+    // Test basic connectivity
+    await client.execute('SELECT 1');
+
+    // Get chat count
+    final chatResultSet = await client.query('SELECT COUNT(*) as count FROM chats');
+    final chatCount = chatResultSet.isNotEmpty ? chatResultSet.first['count'] as int : 0;
+
+    // Get message count
+    final messageResultSet = await client.query('SELECT COUNT(*) as count FROM chat_messages');
+    final messageCount = messageResultSet.isNotEmpty ? messageResultSet.first['count'] as int : 0;
+
+    // Test vector tables if they exist
+    int vectorCollectionsCount = 0;
+    int vectorEmbeddingsCount = 0;
+
+    try {
+      final vectorResultSet = await client.query('SELECT COUNT(*) as count FROM vector_collections');
+      vectorCollectionsCount = vectorResultSet.isNotEmpty ? vectorResultSet.first['count'] as int : 0;
+
+      final embeddingResultSet = await client.query('SELECT COUNT(*) as count FROM vector_embeddings');
+      vectorEmbeddingsCount = embeddingResultSet.isNotEmpty ? embeddingResultSet.first['count'] as int : 0;
+    } catch (e) {
+      // Vector tables might not exist yet
+      Logger.root.info('Vector tables not found or not accessible: $e');
+    }
+
+    return {
+      'healthy': true,
+      'chatCount': chatCount,
+      'messageCount': messageCount,
+      'vectorCollectionsCount': vectorCollectionsCount,
+      'vectorEmbeddingsCount': vectorEmbeddingsCount,
+      'connectionType': db.client.url != null ? 'remote' : 'local',
+      'remoteUrl': db.client.url,
+      'checkedAt': DateTime.now().toIso8601String(),
+    };
+  } catch (e) {
+    return {
+      'healthy': false,
+      'error': e.toString(),
+      'checkedAt': DateTime.now().toIso8601String(),
+    };
+  }
 }
 
 /// Migration result

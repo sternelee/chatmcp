@@ -10,15 +10,7 @@ import '../services/vector_database_service.dart';
 import '../dao/vector_database.dart';
 
 /// Document processing status
-enum DocumentProcessingStatus {
-  idle,
-  reading,
-  parsing,
-  vectorizing,
-  saving,
-  completed,
-  error,
-}
+enum DocumentProcessingStatus { idle, reading, parsing, vectorizing, saving, completed, error }
 
 /// Document information
 class DocumentInfo {
@@ -114,10 +106,7 @@ class DocumentChunk {
   final String content;
   final Map<String, dynamic> metadata;
 
-  DocumentChunk({
-    required this.content,
-    required this.metadata,
-  });
+  DocumentChunk({required this.content, required this.metadata});
 }
 
 /// Document processing configuration
@@ -147,19 +136,7 @@ class DocumentVectorService {
   final VectorDatabaseService _vectorService = VectorDatabaseService();
 
   /// Supported file types
-  static const supportedFileTypes = [
-    '.txt',
-    '.md',
-    '.pdf',
-    '.docx',
-    '.doc',
-    '.rtf',
-    '.html',
-    '.htm',
-    '.json',
-    '.xml',
-    '.csv',
-  ];
+  static const supportedFileTypes = ['.txt', '.md', '.pdf', '.docx', '.doc', '.rtf', '.html', '.htm', '.json', '.xml', '.csv'];
 
   /// Process documents and vectorize them
   Future<List<DocumentInfo>> processDocuments({
@@ -179,10 +156,7 @@ class DocumentVectorService {
 
     if (collection == null) {
       _logger.severe('Failed to create or get collection: ${config.collectionName}');
-      return documents.map((doc) => doc.copyWith(
-        status: DocumentProcessingStatus.error,
-        errorMessage: 'Failed to create collection',
-      )).toList();
+      return documents.map((doc) => doc.copyWith(status: DocumentProcessingStatus.error, errorMessage: 'Failed to create collection')).toList();
     }
 
     for (final document in documents) {
@@ -192,53 +166,33 @@ class DocumentVectorService {
         // Read document content
         final content = await _readDocument(document);
         if (content == null || content.isEmpty) {
-          processedDocuments.add(document.copyWith(
-            status: DocumentProcessingStatus.error,
-            errorMessage: 'Failed to read document or document is empty',
-          ));
+          processedDocuments.add(
+            document.copyWith(status: DocumentProcessingStatus.error, errorMessage: 'Failed to read document or document is empty'),
+          );
           continue;
         }
 
-        onProgress?.call(document.copyWith(
-          status: DocumentProcessingStatus.parsing,
-          content: content,
-        ));
+        onProgress?.call(document.copyWith(status: DocumentProcessingStatus.parsing, content: content));
 
         // Parse document into chunks
         final chunks = _parseDocument(content, document, config);
         if (chunks.isEmpty) {
-          processedDocuments.add(document.copyWith(
-            status: DocumentProcessingStatus.error,
-            errorMessage: 'Failed to parse document into chunks',
-          ));
+          processedDocuments.add(document.copyWith(status: DocumentProcessingStatus.error, errorMessage: 'Failed to parse document into chunks'));
           continue;
         }
 
-        onProgress?.call(document.copyWith(
-          status: DocumentProcessingStatus.vectorizing,
-          content: content,
-        ));
+        onProgress?.call(document.copyWith(status: DocumentProcessingStatus.vectorizing, content: content));
 
         // Generate embeddings for chunks
         final chunkTexts = chunks.map((chunk) => chunk.content).toList();
-        final embeddingResponse = await EmbeddingService.createEmbeddings(
-          texts: chunkTexts,
-          model: config.modelName,
-        );
+        final embeddingResponse = await EmbeddingService.createEmbeddings(texts: chunkTexts, model: config.modelName);
 
         if (embeddingResponse == null || embeddingResponse.data.isEmpty) {
-          processedDocuments.add(document.copyWith(
-            status: DocumentProcessingStatus.error,
-            errorMessage: 'Failed to generate embeddings',
-          ));
+          processedDocuments.add(document.copyWith(status: DocumentProcessingStatus.error, errorMessage: 'Failed to generate embeddings'));
           continue;
         }
 
-        onProgress?.call(document.copyWith(
-          status: DocumentProcessingStatus.saving,
-          content: content,
-          vectorCount: chunks.length,
-        ));
+        onProgress?.call(document.copyWith(status: DocumentProcessingStatus.saving, content: content, vectorCount: chunks.length));
 
         // Save to vector database
         final vectorEmbeddings = <VectorEmbedding>[];
@@ -265,25 +219,16 @@ class DocumentVectorService {
         }
 
         if (vectorEmbeddings.isNotEmpty) {
-          processedDocuments.add(document.copyWith(
-            status: DocumentProcessingStatus.completed,
-            content: content,
-            vectorCount: vectorEmbeddings.length,
-          ));
+          processedDocuments.add(
+            document.copyWith(status: DocumentProcessingStatus.completed, content: content, vectorCount: vectorEmbeddings.length),
+          );
           _logger.info('Successfully processed document: ${document.fileName} (${vectorEmbeddings.length} chunks)');
         } else {
-          processedDocuments.add(document.copyWith(
-            status: DocumentProcessingStatus.error,
-            errorMessage: 'Failed to save embeddings to database',
-          ));
+          processedDocuments.add(document.copyWith(status: DocumentProcessingStatus.error, errorMessage: 'Failed to save embeddings to database'));
         }
-
       } catch (e, stackTrace) {
         _logger.severe('Failed to process document ${document.fileName}: $e', stackTrace);
-        processedDocuments.add(document.copyWith(
-          status: DocumentProcessingStatus.error,
-          errorMessage: e.toString(),
-        ));
+        processedDocuments.add(document.copyWith(status: DocumentProcessingStatus.error, errorMessage: e.toString()));
       }
     }
 
@@ -354,15 +299,12 @@ class DocumentVectorService {
 
       if (chunkWords.isNotEmpty) {
         final chunkContent = chunkWords.join(' ');
-        chunks.add(DocumentChunk(
-          content: chunkContent,
-          metadata: {
-            'chunk_start': i,
-            'chunk_end': endIndex,
-            'word_count': chunkWords.length,
-            'char_count': chunkContent.length,
-          },
-        ));
+        chunks.add(
+          DocumentChunk(
+            content: chunkContent,
+            metadata: {'chunk_start': i, 'chunk_end': endIndex, 'word_count': chunkWords.length, 'char_count': chunkContent.length},
+          ),
+        );
       }
 
       if (endIndex >= words.length) break;
@@ -397,10 +339,7 @@ class DocumentVectorService {
   /// Extract text from HTML
   String _extractTextFromHtml(String htmlContent) {
     // Simple HTML tag removal
-    final cleanText = htmlContent
-        .replaceAll(RegExp(r'<[^>]*>'), ' ')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
+    final cleanText = htmlContent.replaceAll(RegExp(r'<[^>]*>'), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
     return cleanText;
   }
 
@@ -456,10 +395,7 @@ class DocumentVectorService {
   }
 
   /// Delete document vectors from collection
-  Future<bool> deleteDocumentVectors({
-    required String collectionName,
-    required String documentId,
-  }) async {
+  Future<bool> deleteDocumentVectors({required String collectionName, required String documentId}) async {
     try {
       // Get collection
       final collection = await _vectorService.getCollection(collectionName);
@@ -468,10 +404,7 @@ class DocumentVectorService {
       // Get all embeddings with document_id metadata
       // Note: This would require metadata search capability in vector database
       // For now, we'll implement a simple approach
-      final embeddings = await _vectorService.getEmbeddings(
-        collectionName: collectionName,
-        contentFilter: documentId,
-      );
+      final embeddings = await _vectorService.getEmbeddings(collectionName: collectionName, contentFilter: documentId);
 
       // Delete each embedding
       for (final embedding in embeddings) {
@@ -505,3 +438,4 @@ class DocumentVectorService {
     }
   }
 }
+

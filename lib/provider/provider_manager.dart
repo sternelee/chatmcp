@@ -81,15 +81,17 @@ class ProviderManager {
   }
 
   static Future<void> init() async {
+    // Temporarily use legacy mode to avoid libsql_dart connection issues
     // Initialize libsql_dart repository by default
-    ChatRepositoryProvider.enableLibSqlMode();
-    Logger.root.info('Initialized libsql_dart repository');
+    // ChatRepositoryProvider.enableLibSqlMode();
+    // Logger.root.info('Initialized libsql_dart repository');
 
+    // Temporarily disable vector database and knowledge base as they depend on libsql_dart
     // Initialize vector database
-    await VectorDatabaseProvider().initialize();
+    // await VectorDatabaseProvider().initialize();
 
     // Initialize knowledge base
-    await KnowledgeBaseProvider().initialize();
+    // await KnowledgeBaseProvider().initialize();
 
     await SettingsProvider().loadSettings();
     await ChatProvider().loadChats();

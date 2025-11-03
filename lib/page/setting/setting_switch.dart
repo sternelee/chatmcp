@@ -24,31 +24,31 @@ class SettingSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      title: Text(
-        title,
-        style: TextStyle(fontSize: titleFontSize, color: Theme.of(context).colorScheme.onSurface),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(fontSize: subtitleFontSize, color: Theme.of(context).colorScheme.onSurface.withAlpha(subtitleAlpha)),
-      ),
-      trailing: SizedBox(
-        width: 35.0,
-        child: FlutterSwitch(
-          value: value,
-          onToggle: onChanged,
-          width: 32.0,
-          height: 18.0,
-          toggleSize: 14.0,
-          borderRadius: 10.0,
-          padding: 1.5,
-          activeColor: Theme.of(context).colorScheme.primary,
-          inactiveColor: Theme.of(context).colorScheme.outline.withAlpha(76),
-          toggleColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: titleFontSize, color: Theme.of(context).colorScheme.onSurface),
         ),
-      ),
-      onTap: () => onChanged(!value),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(fontSize: subtitleFontSize, color: Theme.of(context).colorScheme.onSurface.withAlpha(subtitleAlpha)),
+        ),
+        trailing: SizedBox(
+          width: 48.0,
+          child: FlutterSwitch(
+            value: value,
+            onToggle: onChanged,
+            width: 32.0,
+            height: 18.0,
+            toggleSize: 14.0,
+            borderRadius: 10.0,
+            padding: 1.5,
+            activeColor: Theme.of(context).colorScheme.primary,
+            inactiveColor: Theme.of(context).colorScheme.outline.withAlpha(76),
+            toggleColor: Colors.white,
+          ),
+        ),
+        onTap: () => onChanged(!value),
     );
   }
 }

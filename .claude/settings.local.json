@@ -4,7 +4,9 @@
       "mcp__mcphub__context7-resolve-library-id",
       "WebFetch(domain:pub.dev)",
       "Bash(flutter pub add:*)",
-      "Bash(flutter analyze:*)"
+      "Bash(flutter analyze:*)",
+      "Bash(flutter pub:*)",
+      "Bash(flutter run:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

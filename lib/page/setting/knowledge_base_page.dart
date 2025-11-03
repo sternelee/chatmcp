@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:logging/logging.dart';
 import '../../provider/knowledge_base_provider.dart';
 import '../../services/document_vector_service.dart';

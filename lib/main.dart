@@ -1,4 +1,3 @@
-import 'package:chatmcp/dao/init_db.dart';
 import 'package:chatmcp/dao/libsql_init_db.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -54,9 +53,11 @@ void main() async {
   }
 
   try {
+    // Temporarily use legacy database to avoid libsql_dart connection issues
     // Initialize database (libsql_dart with migration support)
-    await initLibSqlDatabase(enableRemoteSync: false);
+    // await initLibSqlDatabase(enableRemoteSync: false);
 
+    // Use legacy provider initialization
     await Future.wait([ProviderManager.init()]);
 
     var app = MyApp();

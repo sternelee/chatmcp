@@ -83,10 +83,7 @@ class VectorDatabaseService {
       }
 
       // Generate embeddings
-      final embeddingResponse = await EmbeddingService.createEmbeddings(
-        texts: texts,
-        model: modelName ?? collection.modelName,
-      );
+      final embeddingResponse = await EmbeddingService.createEmbeddings(texts: texts, model: modelName ?? collection.modelName);
 
       if (embeddingResponse == null || embeddingResponse.data.isEmpty) {
         _logger.severe('Failed to generate embeddings');
@@ -99,11 +96,7 @@ class VectorDatabaseService {
         embeddings: texts.asMap().entries.map((entry) {
           final index = entry.key;
           final text = entry.value;
-          return (
-            content: text,
-            embedding: embeddingResponse.data[index].embedding,
-            metadata: metadata,
-          );
+          return (content: text, embedding: embeddingResponse.data[index].embedding, metadata: metadata);
         }).toList(),
       );
 
@@ -123,12 +116,7 @@ class VectorDatabaseService {
     Map<String, dynamic>? metadata,
   }) async {
     try {
-      final embeddings = await addTextEmbeddings(
-        collectionName: collectionName,
-        texts: [text],
-        modelName: modelName,
-        metadata: metadata,
-      );
+      final embeddings = await addTextEmbeddings(collectionName: collectionName, texts: [text], modelName: modelName, metadata: metadata);
 
       return embeddings?.isNotEmpty == true ? embeddings!.first : null;
     } catch (e) {
@@ -154,10 +142,7 @@ class VectorDatabaseService {
       }
 
       // Generate embedding for query text
-      final embeddingResponse = await EmbeddingService.createEmbedding(
-        text: queryText,
-        model: modelName ?? collection.modelName,
-      );
+      final embeddingResponse = await EmbeddingService.createEmbedding(text: queryText, model: modelName ?? collection.modelName);
 
       if (embeddingResponse == null || embeddingResponse.data.isEmpty) {
         _logger.severe('Failed to generate embedding for query text');
@@ -199,10 +184,7 @@ class VectorDatabaseService {
       }
 
       // Generate embedding for query text
-      final embeddingResponse = await EmbeddingService.createEmbedding(
-        text: queryText,
-        model: modelName ?? collection.modelName,
-      );
+      final embeddingResponse = await EmbeddingService.createEmbedding(text: queryText, model: modelName ?? collection.modelName);
 
       if (embeddingResponse == null || embeddingResponse.data.isEmpty) {
         _logger.severe('Failed to generate embedding for query text');
@@ -265,12 +247,7 @@ class VectorDatabaseService {
   }
 
   /// Get embeddings from collection
-  Future<List<VectorEmbedding>> getEmbeddings({
-    required String collectionName,
-    int? limit,
-    int? offset,
-    String? contentFilter,
-  }) async {
+  Future<List<VectorEmbedding>> getEmbeddings({required String collectionName, int? limit, int? offset, String? contentFilter}) async {
     try {
       final collection = await _collectionDao.getCollectionByName(collectionName);
       if (collection == null) {
@@ -278,12 +255,7 @@ class VectorDatabaseService {
         return [];
       }
 
-      return await _embeddingDao.getEmbeddingsByCollection(
-        collectionId: collection.id!,
-        limit: limit,
-        offset: offset,
-        contentFilter: contentFilter,
-      );
+      return await _embeddingDao.getEmbeddingsByCollection(collectionId: collection.id!, limit: limit, offset: offset, contentFilter: contentFilter);
     } catch (e) {
       _logger.severe('Failed to get embeddings: $e');
       return [];
@@ -315,21 +287,12 @@ class VectorDatabaseService {
       );
     } catch (e) {
       _logger.severe('Failed to get database stats: $e');
-      return VectorDatabaseStats(
-        totalCollections: 0,
-        totalEmbeddings: 0,
-        embeddingsByCollection: {},
-        availableModels: [],
-      );
+      return VectorDatabaseStats(totalCollections: 0, totalEmbeddings: 0, embeddingsByCollection: {}, availableModels: []);
     }
   }
 
   /// Search embeddings by content (text-based search)
-  Future<List<VectorEmbedding>> searchByContent({
-    required String collectionName,
-    required String query,
-    int limit = 10,
-  }) async {
+  Future<List<VectorEmbedding>> searchByContent({required String collectionName, required String query, int limit = 10}) async {
     try {
       final collection = await _collectionDao.getCollectionByName(collectionName);
       if (collection == null) {
@@ -337,11 +300,7 @@ class VectorDatabaseService {
         return [];
       }
 
-      return await _embeddingDao.searchByContent(
-        collectionId: collection.id!,
-        query: query,
-        limit: limit,
-      );
+      return await _embeddingDao.searchByContent(collectionId: collection.id!, query: query, limit: limit);
     } catch (e) {
       _logger.severe('Failed to search by content: $e');
       return [];
@@ -349,11 +308,7 @@ class VectorDatabaseService {
   }
 
   /// Update collection metadata
-  Future<bool> updateCollection({
-    required String name,
-    String? description,
-    Map<String, dynamic>? metadata,
-  }) async {
+  Future<bool> updateCollection({required String name, String? description, Map<String, dynamic>? metadata}) async {
     try {
       final collection = await _collectionDao.getCollectionByName(name);
       if (collection == null) {
@@ -379,10 +334,7 @@ class VectorDatabaseService {
     try {
       // Use a simple test text to get embedding dimension
       const testText = "test";
-      final response = await EmbeddingService.createEmbedding(
-        text: testText,
-        model: modelName,
-      );
+      final response = await EmbeddingService.createEmbedding(text: testText, model: modelName);
 
       return response?.data.first.embedding.length;
     } catch (e) {
@@ -414,12 +366,7 @@ class VectorDatabaseService {
         return existingCollection;
       }
 
-      return await createCollection(
-        name: name,
-        description: description,
-        modelName: modelName,
-        metadata: metadata,
-      );
+      return await createCollection(name: name, description: description, modelName: modelName, metadata: metadata);
     } catch (e) {
       _logger.severe('Failed to get or create collection: $e');
       return null;

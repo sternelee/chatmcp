@@ -23,7 +23,7 @@ class ChatRepositoryFactory {
 
 class ChatRepositoryProvider {
   static ChatRepository? _instance;
-  static RepositoryType _currentType = RepositoryType.libsql; // Default to libsql_dart
+  static RepositoryType _currentType = RepositoryType.local; // Default to local (sqflite) for now
 
   static ChatRepository get instance {
     return _instance ??= ChatRepositoryFactory.create(_currentType);
@@ -51,7 +51,7 @@ class ChatRepositoryProvider {
 
   static void reset() {
     _instance = null;
-    _currentType = RepositoryType.libsql; // Reset to libsql_dart
+    _currentType = RepositoryType.local; // Reset to local (sqflite) for now
   }
 
   /// Get current repository type

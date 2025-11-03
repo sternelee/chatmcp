@@ -91,23 +91,23 @@ class LibSqlChatRepository implements ChatRepository {
   }
 
   @override
-  Future<chat.Chat> createChat(chat.Chat chat, List<ChatMessage> messages) async {
+  Future<chat.Chat> createChat(chat.Chat newChat, List<ChatMessage> messages) async {
     try {
       // Convert to libsql_dart Chat model
       final libsqlChat = Chat(
-        id: chat.id,
-        title: chat.title,
-        createdAt: chat.createdAt,
-        updatedAt: chat.updatedAt,
+        id: newChat.id,
+        title: newChat.title,
+        createdAt: newChat.createdAt,
+        updatedAt: newChat.updatedAt,
       );
 
       // Insert chat
       final chatId = await _chatDao.insert(libsqlChat);
-      final newChat = chat.Chat(
+      final createdChat = chat.Chat(
         id: chatId,
-        title: chat.title,
-        createdAt: chat.createdAt,
-        updatedAt: chat.updatedAt,
+        title: libsqlChat.title,
+        createdAt: libsqlChat.createdAt,
+        updatedAt: libsqlChat.updatedAt,
       );
 
       // Insert messages if provided
@@ -116,7 +116,7 @@ class LibSqlChatRepository implements ChatRepository {
       }
 
       Logger.root.info('Created new chat with ID: $chatId');
-      return newChat;
+      return createdChat;
     } catch (e) {
       Logger.root.severe('Failed to create chat: $e');
       rethrow;
@@ -124,19 +124,19 @@ class LibSqlChatRepository implements ChatRepository {
   }
 
   @override
-  Future<void> updateChat(chat.Chat chat) async {
+  Future<void> updateChat(chat.Chat chatToUpdate) async {
     try {
-      if (chat.id != null) {
+      if (chatToUpdate.id != null) {
         // Convert to libsql_dart Chat model
         final libsqlChat = Chat(
-          id: chat.id,
-          title: chat.title,
-          createdAt: chat.createdAt,
-          updatedAt: chat.updatedAt,
+          id: chatToUpdate.id,
+          title: chatToUpdate.title,
+          createdAt: chatToUpdate.createdAt,
+          updatedAt: chatToUpdate.updatedAt,
         );
 
-        await _chatDao.update(libsqlChat, chat.id!);
-        Logger.root.info('Updated chat with ID: ${chat.id}');
+        await _chatDao.update(libsqlChat, chatToUpdate.id!);
+        Logger.root.info('Updated chat with ID: ${chatToUpdate.id}');
       } else {
         throw ArgumentError('Chat ID cannot be null for update');
       }

@@ -9,7 +9,6 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:logging/logging.dart';
 import 'package:chatmcp/dao/init_db.dart';
-import 'package:chatmcp/dao/libsql_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:chatmcp/provider/provider_manager.dart';
 import 'package:sqflite/sqflite.dart';
