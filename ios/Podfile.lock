@@ -43,6 +43,8 @@ PODS:
     - OrderedSet (~> 6.0.3)
   - flutter_keyboard_visibility (0.0.1):
     - Flutter
+  - libsql_dart (0.0.1):
+    - Flutter
   - mobile_scanner (7.0.0):
     - Flutter
     - FlutterMacOS
@@ -74,6 +76,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
+  - libsql_dart (from `.symlinks/plugins/libsql_dart/ios`)
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/darwin`)
   - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
@@ -100,6 +103,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_inappwebview_ios/ios"
   flutter_keyboard_visibility:
     :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
+  libsql_dart:
+    :path: ".symlinks/plugins/libsql_dart/ios"
   mobile_scanner:
     :path: ".symlinks/plugins/mobile_scanner/darwin"
   network_info_plus:
@@ -124,6 +129,7 @@ SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_inappwebview_ios: b89ba3482b96fb25e00c967aae065701b66e9b99
   flutter_keyboard_visibility: 4625131e43015dbbe759d9b20daaf77e0e3f6619
+  libsql_dart: 99d328ca71b3e0c615db13000da20d6c3db25de6
   mobile_scanner: 9157936403f5a0644ca3779a38ff8404c5434a93
   network_info_plus: 16d8832ab43b7bc22b168d76fffcad9da35486d2
   OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94

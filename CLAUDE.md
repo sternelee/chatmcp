@@ -75,22 +75,27 @@ ChatMCP is a cross-platform AI chat client built with Flutter that supports mult
 ### Data Storage
 - **Desktop**: Platform-specific application directories (~/Library/Application Support/ChatMcp on macOS, %APPDATA%/ChatMcp on Windows, ~/.local/share/ChatMcp on Linux)
 - **Mobile**: Application documents directory
-- **Database**: SQLite with libsql_dart for remote synchronization capabilities
+- **Database**: Dual system with SQLite (sqflite) for legacy and libsql_dart for remote sync capabilities
 - **Sync**: LAN-based data synchronization between devices
+- **File Structure**: Unified directory with `logs/`, `chatmcp.db`, `shared_preferences.json`, `mcp_server.json`
 
 ### Key Features
 - Multi-platform support (macOS, Windows, Linux, iOS, Android, Web)
-- MCP server marketplace and dynamic server loading
-- Multiple LLM provider support with unified interface
-- Real-time chat with streaming responses
-- Markdown rendering with LaTeX, mermaid diagrams, and HTML preview
-- Artifact display and code execution
-- Dark/light theme support
+- MCP server marketplace and dynamic server loading with multi-transport support (stdio, SSE, in-memory)
+- Multiple LLM provider support with unified interface (Claude, OpenAI, DeepSeek, Ollama, Copilot, Claude Code)
+- Real-time chat with streaming responses via Server-Sent Events
+- Advanced markdown rendering with LaTeX, mermaid diagrams, HTML preview, and custom components
+- Artifact display and code execution with hash-based caching
+- Dark/light theme support with persistence
 - Network synchronization for chat history
+- Responsive design with adaptive mobile/desktop layouts
 
 ### Development Notes
-- **Pre-commit Hook**: Mandatory code formatting on every commit
+- **Pre-commit Hook**: Mandatory code formatting on every commit (setup via `make setup-git-hooks`)
 - **Line Width**: 150 characters (configured in analysis_options.yaml)
-- **Database Migration**: Uses both sqflite and libsql_dart for legacy and new functionality
-- **Internationalization**: Full localization support via flutter_localizations
+- **Database Migration**: Dual database system - SQLite (sqflite) for legacy functionality and libsql_dart for modern remote sync
+- **Internationalization**: Full localization support via flutter_localizations (en, zh, tr, de locales)
 - **Testing**: Includes unit tests with mockito for mocking
+- **Architecture**: Provider-based state management with ChangeNotifier pattern
+- **Entry Points**: `lib/main.dart` for app initialization, `lib/page/layout/layout.dart` for primary layout
+- **Repository Pattern**: Abstract `ChatRepository` interface with local and remote implementations

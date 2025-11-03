@@ -6,7 +6,9 @@
       "Bash(flutter pub add:*)",
       "Bash(flutter analyze:*)",
       "Bash(flutter pub:*)",
-      "Bash(flutter run:*)"
+      "Bash(flutter run:*)",
+      "Bash(git commit:*)",
+      "mcp__jean-memory__jean_memory"
     ]
   },
   "enableAllProjectMcpServers": true,
